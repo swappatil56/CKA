@@ -1,1 +1,1033 @@
-Just a test file
+controlplane $ vi 1.yaml
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl apply -f 1.yaml 
+networkpolicy.networking.k8s.io/test-network-policy created
+controlplane $ kubectl run web --image nginx -l app=web --expose --port 80
+service/web created
+pod/web created
+controlplane $ kubectl get pods
+NAME   READY   STATUS              RESTARTS   AGE
+web    0/1     ContainerCreating   0          4s
+controlplane $ kubectl get svc
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP   25d
+web          ClusterIP   10.110.75.202   <none>        80/TCP    8s
+controlplane $ vi 2.yaml
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl apply -f 2.yaml 
+networkpolicy.networking.k8s.io/test-network-policy configured
+controlplane $ kubectl get pods
+NAME   READY   STATUS    RESTARTS   AGE
+web    1/1     Running   0          4m56s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                  POD-SELECTOR   AGE
+test-network-policy   <none>         7m44s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -- wget -O- "web:80"
+If you don't see a command prompt, try pressing enter.
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -n foo -- wget -O- "web:80"
+Error from server (NotFound): namespaces "foo" not found
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl create nns foo
+Error: must specify one of -f and -k
+
+error: unknown command "nns foo"
+See 'kubectl create -h' for help and examples
+controlplane $ kubectl create ns foo
+namespace/foo created
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -n foo -- wget -O- "web:80"
+wget: bad address 'web:80'
+pod foo/busybox terminated (Error)
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run web --image nginx -l app=web --expose --port 80 -n foo
+service/web created
+pod/web created
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -n foo -- wget -O- "web:80"
+Error from server (AlreadyExists): pods "busybox" already exists
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete pod busybox
+pod "busybox" deleted
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -n foo -- wget -O- "web:80"
+Error from server (AlreadyExists): pods "busybox" already exists
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete pod busybox
+Error from server (NotFound): pods "busybox" not found
+controlplane $ kubectl run busybox --image busybox -it --rm --restart=Never -n foo -- wget -O- "web:80"
+Error from server (AlreadyExists): pods "busybox" already exists
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get pod
+NAME   READY   STATUS    RESTARTS   AGE
+web    1/1     Running   0          8m21s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get pod -n foo
+NAME      READY   STATUS    RESTARTS   AGE
+busybox   0/1     Error     0          88s
+web       1/1     Running   0          51s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete pod bussybox
+Error from server (NotFound): pods "bussybox" not found
+controlplane $ kubectl delete pod busybox
+Error from server (NotFound): pods "busybox" not found
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete pod busybox -n foo
+pod "busybox" deleted
+controlplane $ kubectl run busybox --image busybox -it --rm --restart=Never -n foo -- wget -O- "web:80"
+
+Connecting to web:80 (10.96.129.144:80)
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |********************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ ls
+1.yaml  2.yaml  filesystem  filesystem-host02
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ vi 2.yaml 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl apply -f 2.yaml 
+networkpolicy.networking.k8s.io/deny-from-other-namespaces created
+controlplane $ kubectl run busybox --image busybox -it --rm --restart=Never -n foo -- wget -O- "web:80"
+
+
+
+
+Connecting to web:80 (10.96.129.144:80)
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |********************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                         POD-SELECTOR   AGE
+deny-from-other-namespaces   <none>         60s
+test-network-policy          <none>         13m
+controlplane $ caat 1.yaml 
+
+Command 'caat' not found, did you mean:
+
+  command 'acat' from deb atool (0.39.0-10)
+  command 'ccat' from deb ccrypt (1.11-1)
+  command 'chat' from deb ppp (2.4.7-2+4.1ubuntu5.1)
+  command 'cat' from deb coreutils (8.30-3ubuntu2)
+
+Try: apt install <deb name>
+
+controlplane $ cat 1.yaml 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress: []
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete netpol test-network-policy
+networkpolicy.networking.k8s.io "test-network-policy" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --rm --restart=Never -n foo -- wget -O- "web:80"
+
+
+
+
+Connecting to web:80 (10.96.129.144:80)
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+controlplane $ kubectl run web --namespace=default --image=nginx --labels="app=web" --expose --port=80
+\Error from server (AlreadyExists): pods "web" already exists
+controlplane $  
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get pods --show-laabels
+Error: unknown flag: --show-laabels
+See 'kubectl get --help' for usage.
+controlplane $ kubectl get pods --show-labels
+NAME   READY   STATUS    RESTARTS   AGE   LABELS
+web    1/1     Running   0          20m   app=web
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ ls
+1.yaml  2.yaml  filesystem  filesystem-host02
+controlplane $ 
+controlplane $ 
+controlplane $ vi 3.yaml
+controlplane $ 
+controlplane $ 
+controlplane $ vi 3.yaml 
+controlplane $ kubectl apply -f web
+error: the path "web" does not exist
+controlplane $ kubectl apply -f 3.yaml 
+networkpolicy.networking.k8s.io/web-allow-network-policy created
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                         POD-SELECTOR   AGE
+deny-from-other-namespaces   <none>         12m
+web-allow-network-policy     app=web        5s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get ns
+NAME              STATUS   AGE
+default           Active   25d
+foo               Active   17m
+kube-node-lease   Active   25d
+kube-public       Active   25d
+kube-system       Active   25d
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never -- wget -O- "web.defaault:80"
+E0427 06:53:07.859547   35568 run.go:120] "command failed" err="required flag(s) \"image\" not set"
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -- wget -O- "web.defaault:80"
+wget: bad address 'web.defaault:80'
+pod "busybox" deleted
+pod default/busybox terminated (Error)
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -- wget -O- "web.default:80"
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                         POD-SELECTOR   AGE
+deny-from-other-namespaces   <none>         15m
+web-allow-network-policy     app=web        2m27s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete netpol deny-from-other-namespaces
+networkpolicy.networking.k8s.io "deny-from-other-namespaces" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                       POD-SELECTOR   AGE
+web-allow-network-policy   app=web        2m39s
+controlplane $ ls
+1.yaml  2.yaml  3.yaml  filesystem  filesystem-host02
+controlplane $ kubectl apply -f 2.yaml 
+networkpolicy.networking.k8s.io/deny-from-other-namespaces created
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -- wget -O- "web.default:80"
+
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                         POD-SELECTOR   AGE
+deny-from-other-namespaces   <none>         15s
+web-allow-network-policy     app=web        3m10s
+controlplane $ kubectl delete netpol web-allow-network-policy
+networkpolicy.networking.k8s.io "web-allow-network-policy" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -- wget -O- "web.default:80"
+
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -- wget -O- "web.default:80"
+
+
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -n foo -- wget -O- "web.default:80"
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+
+^C^C
+
+
+wget: can't connect to remote host (10.110.75.202): Connection timed out
+pod "busybox" deleted
+pod foo/busybox terminated (Error)
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ ls
+1.yaml  2.yaml  3.yaml  filesystem  filesystem-host02
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl apply 3.yaml 
+error: must specify one of -f and -k
+controlplane $ kubectl apply -f 3.yaml 
+networkpolicy.networking.k8s.io/web-allow-network-policy created
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -n foo -- wget -O- --timeout 1 "web.default:80"
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+wget: download timed out
+pod "busybox" deleted
+pod foo/busybox terminated (Error)
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                         POD-SELECTOR   AGE
+deny-from-other-namespaces   <none>         3m50s
+web-allow-network-policy     app=web        21s
+controlplane $ kubectl delete netpol web-allow-network-policy
+networkpolicy.networking.k8s.io "web-allow-network-policy" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl apply -f 3.yaml 
+networkpolicy.networking.k8s.io/web-allow-network-policy created
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete netpol deny-from-other-namespaces
+networkpolicy.networking.k8s.io "deny-from-other-namespaces" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -n foo -- wget -O- --timeout 1 "web.default:80"
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+wget: download timed out
+pod "busybox" deleted
+pod foo/busybox terminated (Error)
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ cat 3.yaml 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-allow-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -n foo -- wget -O- --timeout 5 "web.default:80"
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --rm -it --restart=Never --image busybox -n foo -- wget -O- --timeout 5 "web.default:80"
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                       POD-SELECTOR   AGE
+web-allow-network-policy   app=web        3m49s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete nnetpol web-allow-network-policy
+error: the server doesn't have a resource type "nnetpol"
+controlplane $ kubectl delete netpol web-allow-network-policy
+networkpolicy.networking.k8s.io "web-allow-network-policy" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ ls -ltr
+total 16
+drwxr-xr-x 1 root root 4096 Oct  8  2021 filesystem-host02
+lrwxrwxrwx 1 root root    1 Apr  1 14:00 filesystem -> /
+-rw-r--r-- 1 root root  179 Apr 27 06:25 1.yaml
+-rw-r--r-- 1 root root  201 Apr 27 06:38 2.yaml
+-rw-r--r-- 1 root root  254 Apr 27 06:51 3.yaml
+controlplane $ 
+controlplane $ 
+controlplane $ vi 4.yaaml
+controlplane $ vi 4.yaml
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+No resources found in default namespace.
+controlplane $ kubectl apply -f 4.yaml 
+networkpolicy.networking.k8s.io/prodallow-network-policy created
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol    
+NAME                       POD-SELECTOR   AGE
+prodallow-network-policy   app=web        11s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox -it --rm --image busybox --restart=Never -n prod -- wget -O- --timeout 8 "web.default:80"
+If you don't see a command prompt, try pressing enter.
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox -it --rm --image busybox --restart=Never -n dev -- wget -O- --timeout 8 "web.default:80"
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+wget: download timed out
+pod "busybox" deleted
+pod dev/busybox terminated (Error)
+controlplane $ kubectl create namespace other
+namespace/other created
+controlplane $ kubectl label namespace/other team=operations
+namespace/other labeled
+controlplane $ kubectl get netpol
+NAME                       POD-SELECTOR   AGE
+prodallow-network-policy   app=web        4m45s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete pod prodallow-network-policy
+Error from server (NotFound): pods "prodallow-network-policy" not found
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ ls
+1.yaml  2.yaml  3.yaml  4.yaml  filesystem  filesystem-host02
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ vi 5
+controlplane $ vi 5.yaml
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl apply -f 5.yaml 
+networkpolicy.networking.k8s.io/pod-network-policy created
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get netpol
+NAME                       POD-SELECTOR   AGE
+pod-network-policy         app=web        8s
+prodallow-network-policy   app=web        7m45s
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl delete netpol prodallow-network-policy
+networkpolicy.networking.k8s.io "prodallow-network-policy" deleted
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl get ns
+NAME              STATUS   AGE
+default           Active   25d
+dev               Active   13m
+foo               Active   40m
+kube-node-lease   Active   25d
+kube-public       Active   25d
+kube-system       Active   25d
+other             Active   5m12s
+prod              Active   13m
+controlplane $ kubectl get ns --show-labels
+NAME              STATUS   AGE     LABELS
+default           Active   25d     kubernetes.io/metadata.name=default
+dev               Active   13m     kubernetes.io/metadata.name=dev,purpose=testing
+foo               Active   40m     kubernetes.io/metadata.name=foo
+kube-node-lease   Active   25d     kubernetes.io/metadata.name=kube-node-lease
+kube-public       Active   25d     kubernetes.io/metadata.name=kube-public
+kube-system       Active   25d     kubernetes.io/metadata.name=kube-system
+other             Active   5m18s   kubernetes.io/metadata.name=other,team=operations
+prod              Active   14m     kubernetes.io/metadata.name=prod,purpose=production
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never --rm -- wget -O- --timeout=8 "web.default:80"
+
+
+
+
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+
+wget: download timed out
+pod "busybox" deleted
+pod default/busybox terminated (Error)
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -n prod -l type=monitoring --rm -- wget -O- --timeout=8 "web.default:80"
+If you don't see a command prompt, try pressing enter.
+
+
+
+
+wget: download timed out
+pod "busybox" deleted
+pod prod/busybox terminated (Error)
+controlplane $ kubectl create namespace other
+Error from server (AlreadyExists): namespaces "other" already exists
+controlplane $ kubectl label namespace/other team=operations
+error: 'team' already has a value (operations), and --overwrite is false
+controlplane $ ls
+1.yaml  2.yaml  3.yaml  4.yaml  5.yaml  filesystem  filesystem-host02
+controlplane $ 
+controlplane $ 
+controlplane $ cat 5.yaml 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pod-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              team: operations
+        - podSelector:
+            matchLabels:
+              type: monitoring
+controlplane $ 
+controlplane $ 
+controlplane $ 
+controlplane $ kubectl run busybox --image busybox -it --restart=Never -n other -l type=monitoring --rm -- wget -O- --timeout=8 "web.default:80"
+If you don't see a command prompt, try pressing enter.
+writing to stdout
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+-                    100% |************************************************************************************|   615  0:00:00 ETA
+written to stdout
+pod "busybox" deleted
+controlplane $
+
+
+
+
+
+controlplane $ cat 1.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress: []
+controlplane $ cat 2.yaml
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: default
+  name: deny-from-other-namespaces
+spec:
+  podSelector:
+    matchLabels:
+  ingress:
+  - from:
+    - podSelector: {}
+controlplane $ cat 3.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-allow-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+controlplane $ cat 4.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prodallow-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+                  purpose: production
+controlplane $ cat 5.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pod-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: web
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              team: operations
+        - podSelector:
+            matchLabels:
+              type: monitoring
+controlplane $
